@@ -1,0 +1,71 @@
+<style type="text/css" media="screen">
+	body{font:12px sans-serif}
+	.section{
+		background:#f2f2f2;
+		padding:10px;
+		margin:10px;
+	}
+	.comments{
+		border:1px solid #ff0099;
+		padding:10px;
+	}
+	.section .comments{display:none;}
+	.section .comments.open{display:block;}
+	.comment-total{background:#333; color:#fff; cursor:pointer; padding:4px;}
+</style>
+<div class="section" id="section-1" data-sectionId="1">
+	<h1>Section 1</h1>
+	<p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Curabitur blandit tempus porttitor. Maecenas sed diam eget risus varius blandit sit amet non magna. Maecenas faucibus mollis interdum. Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia bibendum nulla sed consectetur.</p>
+</div>
+<div class="section" id="section-2" data-sectionId="2">
+	<h1>Section 2</h1>
+	<p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Curabitur blandit tempus porttitor. Maecenas sed diam eget risus varius blandit sit amet non magna. Maecenas faucibus mollis interdum. Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia bibendum nulla sed consectetur.</p>
+</div>
+<div class="section" id="section-3" data-sectionId="3">
+	<h1>Section 3</h1>
+	<p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Curabitur blandit tempus porttitor. Maecenas sed diam eget risus varius blandit sit amet non magna. Maecenas faucibus mollis interdum. Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia bibendum nulla sed consectetur.</p>
+</div>
+
+<div class="comments">
+	<h1>Comments</h1>
+	<div class="comment-index">
+		<div class="comment" data-commentId="1" data-sectionId="1">Comment 1</div>
+		<div class="comment" data-commentId="2" data-sectionId="1">
+			Comment 2
+			<div class="comment" data-commentId="7">Comment 7</div>
+		</div>
+		<div class="comment" data-commentId="3" data-sectionId="1">Comment 3</div>
+		<div class="comment" data-commentId="4" data-sectionId="2">Comment 4</div>
+		<div class="comment" data-commentId="5" data-sectionId="2">Comment 5</div>
+		<div class="comment" data-commentId="6">Comment 6</div>
+		
+		<div class="comment" data-commentId="8">Comment 8</div>
+		<div class="comment" data-commentId="9">Comment 9</div>
+		<div class="comment" data-commentId="10">Comment 10</div>
+	</div>
+	<div class="comment-form">
+		<h2>Comment Form</h2>
+		<form>
+			<div>Message: <textarea></textarea></div>
+			<div>Comment Parent ID: <input type="text" name="parent_id" /></div>
+			<div>Comment Section ID: <input type="text" name="section_id" /></div>
+			<button type="submit">Submit</button>
+		</form>
+	</div>
+</div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+<script src="./jquery.ui.widget.js"></script>
+<script src="./jquery.ui.sectionComments.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript" charset="utf-8">
+	$('body')
+		.sectionComments()
+		.bind('sectioncommentscommentreply', function(event, ui){
+			console.log("triggered commentsreply");
+			console.log(ui);
+		}).bind('sectioncommentsloadsectioncomments', function(event, ui){
+			console.log("triggered sectioncommentsloadsectioncomments");
+			console.log(ui);
+		});
+</script>
