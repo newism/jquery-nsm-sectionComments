@@ -39,22 +39,17 @@
 
 		// called everytime ‘.comments()’ is executed on an element.
 		_init: function () {
-			//console.log('_init NSM.sectionComments');
 			
 			// Build the sections
 			this._refresh();
 			
-			// calculate the comment count for each element
-			//this.calculateSectionCommentCount();
-			
 			// When reply buttons are clicked, it will update the
 			this._initCommentReplyElements(this.originalComments);
 			
-			// setup events
-			//this._setupEvents();
-			
 			// Get global comment count
 			this.globalComments = this._getGlobalCommentCount();
+			
+			console.log(this.sections);
 		},
 		
 		// Refresh the section data
@@ -94,14 +89,14 @@
 				// Setup the event for when you click the 'open' trigger for this section
 				// For now, we're using the comment count
 				$commentTotal.bind('click', $.proxy(function(){
-					return this.toggleSectionComments(sectionId);
+					this.toggleSectionComments(sectionId);
+					return false;
 				},this));
 				
 				// Add the reply buttons
 				this._initCommentReplyElements(comments);
-
-				//$section.data("commentTotal", $commentTotal);
-					
+				
+				// Save the section
 				this.sections[sectionId] = {
 					
 					// DOM element for this section
@@ -130,35 +125,6 @@
 			commentList.find(this.options.selectors.comment+"[data-sectionId!="+sectionId+"]").remove();
 			return commentList;
 		},
-	
-		// 
-		// // Calculate the comments for the section
-		// calculateSectionCommentCount: function(){
-		// 	//console.log('_calculateCommentCount NSM.sectionComments');
-		// 
-		// 	// Loop over the comments and calculate the totals
-		// 	var sectionCommentTotals = {},
-		// 		$comments = $(".comment", this.originalComments);
-		// 	
-		// 	for (var i = $comments.length - 1; i >= 0; i--){
-		// 		var comment = $comments[i],
-		// 			sectionId = comment.getAttribute('data-sectionId');
-		// 		
-		// 		if(sectionId) {
-		// 			sectionCommentTotals[sectionId] = sectionCommentTotals[sectionId] + 1 || 1;
-		// 		}
-		// 	};
-		// 	
-		// 	for (var sectionId in this.sections) {
-		// 		var section = this.sections[sectionId],
-		// 			sectionCommentTotal = sectionCommentTotals[sectionId] || 0;
-		// 	
-		// 		section.comments = sectionCommentTotal;
-		// 		section.totalComments.text(sectionCommentTotal + " comments");
-		// 	}
-		// 	
-		// 	this.globalComments = sectionCommentTotals[0] || 0;
-		// },
 		
 		// Update the hidden field in a form
 		_setFormData: function(sectionId, parentId){
@@ -173,7 +139,6 @@
 			if(parentId !== undefined) {
 				parentField.val(parentId);
 			}
-
 		},
 		
 		// Set the section ID for the reply links
@@ -185,56 +150,22 @@
 
 		// Load the comments for the section
 		loadSectionComments: function(sectionId) {
-			//console.log('_loadSectionComments NSM.sectionComments');
-
-			// var classes 	= this.options.classes,
-			// 				selectors 	= this.options.selectors,
-			// 				section		= this.sections[sectionId],
-			// 				$section 	= section.element;
 			
 			var section		= this.sections[sectionId],
-				$section 	= section.element;
-
-			// Test to see if there are any existing comments
-			// if so remove them so we can refresh the list / form if needed
-			var $sectionComments = this.sections[sectionId].comments;
+				$section 	= section.element,
+				comments 	= this.sections[sectionId].comments;
 			
-			// Remove them from the page
-			// $sectionComments.remove();
-
-			// $sectionComments = this.originalComments
-			// 						.clone(true) // clone it
-			// 						.data("clone", true); // let everyone know this is a clone
-			
-			// find the form and set the input values
-			// var $sectionCommentForm = $(selectors.commentForm, $sectionComments)
-			// 										.find(selectors.sectionIdInput).val(sectionId).end()
-			// 										.find(selectors.parentCommentIdInput).val(0).end();
-			
-			// Update the comment form
+			// Update the form and reply links
 			this._setFormData(sectionId,0);
 			this._setReplySection(sectionId);
-
-			//this._initCommentReplyElements($sectionComments);
-			
-			// remove comments that don't apply to this section
-			//$sectionComments.find(selectors.comment+"[data-sectionId!="+sectionId+"]").remove();
-		
-			// update the comment reply trigger with the new section
-			// $sectionComments.find(this.options.classes).data({
-			// 				'sectionId': parseInt(sectionId)
-			// 			});
 						
 			// append the new comments to the section
-			this.sections[sectionId].comments.appendTo(section.element);
+			$section.append(comments);
 
-			//this.sections[sectionId].element.data('comments', $sectionComments);
-			//this.sections[sectionId].comments = $sectionComments;
-			
 			// Fire an event
 			this._trigger('loadsectioncomments', {}, 
 				$.extend(this._uiHash(), {
-					comments: $sectionComments,
+					comments: comments,
 					sectionId: sectionId
 				})
 			);
@@ -255,13 +186,14 @@
 				comments.remove().removeClass(openClass);
 			}
 		},
-
-		commentReplyTrigger: function(){
+		
+		// Creates a new reply button for a comment
+		commentReplyTrigger: function(sectionId){
 			var classes = this.options.classes,
 				$trigger = $('<a />')
-					.attr({ href: "#" })
+					.attr({ href: "#", 'data-section-id': sectionId })
 					.addClass(classes.commentReplyTrigger)
-					.text("Reply to this comment");
+					.text("Reply");
 			return $trigger;
 		},
 
@@ -273,35 +205,34 @@
 				options = this.options,
 				classes = this.options.classes,
 				selectors = this.options.selectors,
-				$comments = $(comments),
-				$commentEls = $(".comment", $comments);
+				$commentEls = $(this.options.selectors.comment, comments);
 				
 			for (var i = $commentEls.length - 1; i >= 0; i--){
-				var $comment = $commentEls.eq(i),
-					commentId = $comment.data('commentId') || 0,
-					sectionId = $comment.data('sectionId') || 0,
-					$trigger = $(selectors.commentReplyTrigger, $comment);
+
+				var $comment 	= $commentEls.eq(i),
+					commentId 	= $comment.data('commentId') || 0,
+					sectionId 	= $comment.data('sectionId') || 0,
+					$trigger 	= $(selectors.commentReplyTrigger, $comment);
 				
+				// It doesn't exist
 				if(!$trigger.length) {
-					$trigger = this.commentReplyTrigger();
+					$trigger = this.commentReplyTrigger(sectionId);
 					$comment.prepend($trigger);
 					$trigger.bind('click', $.proxy(this._commentOnComment,this));
 				}
 
-				$trigger.data({
-					'commentId': commentId,
-					'comments': $comments,
-					'comment' : $comment,
-					'sectionId': sectionId
-				});
+				// $trigger.data({
+				// 					'commentId': commentId,
+				// 					'comments': $comments,
+				// 					'comment' : $comment,
+				// 					'sectionId': sectionId
+				// 				});
 			};
 		},
 
 		// Comment on a comment
 		_commentOnComment: function(event) {
-			//console.log('_commentOnComment NSM.sectionComments');
-			event.preventDefault();
-
+	
 			var $eventTarget = $(event.target),
 				$comment = $eventTarget.data("comment"),
 				commentId = $comment.data("commentid") || 0,
@@ -321,21 +252,6 @@
 			);
 
 		},
-
-		// _setupEvents: function(){
-		// 	var self = this;
-		// 	$(".comment-total", this.element).each(function(index) {
-		// 		var $trigger = $(this),
-		// 			sectionId = $trigger.data('sectionid');
-		// 		
-		// 		$trigger.bind('click', function(){
-		// 			return self.toggleSectionComments(sectionId);
-		// 		});
-		// 	});
-		// 
-		// 	$(".comment-reply-trigger", this.element)
-		// 		.bind('click', $.proxy( this, "_commentOnComment" ));
-		// },
 
 		// Sets a value of the options.
 		_setOption: function(key, value) {
