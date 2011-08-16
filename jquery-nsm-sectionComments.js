@@ -40,8 +40,12 @@
 		_init: function () {
 			// Build the sections
 			this._refresh();
+
 			// Setup reply links for global comments
-			this._setupReplyLinks(0,this.originalComments);
+			this.originalComments.find('.comment').each($.proxy(function(i,el){
+				var sectionId = el.getAttribute('data-sectionid');
+				this._setupReplyLinks(sectionId,$(el));
+			},this));		
 		},
 		
 		// Refresh the section data
