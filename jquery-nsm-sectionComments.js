@@ -10,7 +10,7 @@
 				section: '.entry-content-section',
 				comments: '.comments',
 				comment: '.comment',
-				commentForm: '.comment-form',
+				commentForm: '.form-comment-create',
 				commentTotal: '.comment-total',
 				parentCommentIdInput: 'input[name=parent_id]',
 				sectionIdInput: 'input[name=row_id]',
@@ -33,7 +33,7 @@
 			// Cache the original comments so we don't get duplicates
 			this.originalComments = $(this.options.selectors.comments, this.element);
 			// Store the comment form
-			this.form = this.originalComments.find('#comment-form');
+			this.form = this.originalComments.find(this.options.selectors.commentForm);
 		},
 
 		// called everytime ‘.comments()’ is executed on an element.
