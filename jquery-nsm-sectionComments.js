@@ -14,12 +14,16 @@
 				commentTotal: '.comment-total',
 				parentCommentIdInput: 'input[name=parent_id]',
 				sectionIdInput: 'input[name=row_id]',
-				commentReplyTrigger: '.comment-reply-trigger'
-				
+				commentReplyTrigger: '.comment-reply-trigger',
+				commentIndex: '.comment-index'
 			},
 			classes: {
 				commentTotal: 'comment-total',
 				commentReplyTrigger: 'comment-reply-trigger'
+			},
+			attributes: {
+				sectionId: 'data-sectionid', 
+				commentId: 'data-commentId'
 			}
 		},
 
@@ -42,8 +46,8 @@
 			this._refresh();
 
 			// Setup reply links for global comments
-			this.originalComments.find('.comment').each($.proxy(function(i,el){
-				var sectionId = el.getAttribute('data-sectionid');
+			this.originalComments.find(this.options.selectors.comment).each($.proxy(function(i,el){
+				var sectionId = el.getAttribute(this.options.attributes.sectionId);
 				this._setupReplyLinks(sectionId,$(el));
 			},this));		
 		},
@@ -63,7 +67,7 @@
 			for (var i = $sections.length - 1; i >= 0; i--) {
 				
 				$section 		= $sections.eq(i);
-				sectionId 		= $section.attr('data-sectionid');
+				sectionId 		= $section.attr(this.options.attributes.sectionId);
 				
 				// No section ID
 				if(!sectionId) continue;
@@ -121,7 +125,7 @@
 		_getSectionComments: function(sectionId) {
 			var commentList = this.originalComments.clone(true);
 			commentList.find(this.options.selectors.comment+"[data-sectionId!="+sectionId+"]").remove();
-			return commentList.find('.comment');
+			return commentList.find(this.options.selectors.comment);
 		},
 		
 		// Update the hidden field in a form for a section
@@ -142,11 +146,11 @@
 		// Load the comments for the section
 		loadSectionComments: function(sectionId) {
 			var section		= this.sections[sectionId],
-				comments 	= section.element.find('.comment-index');
+				comments 	= section.element.find(this.options.selectors.commentIndex);
 			
 			comments.append(section.comments);
 			comments.after(section.form);
-
+			
 			return true;
 		},
 
@@ -171,7 +175,7 @@
 			$replyLinks.bind('click', $.proxy(function(event){
 				
 				var target 		= $(event.target),
-					commentId 	= target.attr('data-commentId');
+					commentId 	= target.attr(this.options.attributes.commentId);
 						
 				this._trigger('commentreply', event, {
 					widget:this,
