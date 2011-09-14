@@ -76,6 +76,8 @@
 				comments 		= this._getSectionComments(sectionId);
 				totalComments	= comments.length;
 				
+				$section.attr('data-comment-total',totalComments);
+				
 				// Comment total text
 				$commentTotal = $(this.options.selectors.commentTotal, $section);
 				
