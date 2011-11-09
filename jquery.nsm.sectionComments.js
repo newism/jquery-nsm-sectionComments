@@ -93,6 +93,9 @@
 				// The comment form for this section
 				form = this.form.clone();
 				form.attr('id','comment-form-'+sectionId);
+				form.find('[name="RET"]').val(function(i, val) {
+				   return val + '#section-'+sectionId+'-comments';
+				});
 				
 				// Setup the reply links
 				this._setupReplyLinks(sectionId,comments);
